@@ -1,0 +1,42 @@
+<h2 class="text-3xl font-bold text-slate-800 mb-2">Laporan & Analitik</h2>
+<p class="text-sm text-slate-500 mb-6">Hasilkan dan unduh laporan data sistem dalam berbagai format.</p>
+
+<div class="border-b border-slate-200">
+    <nav id="laporan-tabs" class="-mb-px flex gap-6" aria-label="Tabs">
+        <a href="#" data-report="pengaduan" class="report-tab shrink-0 border-b-2 border-blue-500 px-1 pb-4 text-sm font-medium text-blue-600">
+            Pengaduan
+        </a>
+        <a href="#" data-report="infrastruktur" class="report-tab shrink-0 border-b-2 border-transparent px-1 pb-4 text-sm font-medium text-slate-500 hover:border-slate-300 hover:text-slate-700">
+            Infrastruktur
+        </a>
+        <a href="#" data-report="perumahan" class="report-tab shrink-0 border-b-2 border-transparent px-1 pb-4 text-sm font-medium text-slate-500 hover:border-slate-300 hover:text-slate-700">
+            Perumahan
+        </a>
+    </nav>
+</div>
+
+<div id="laporan-filter-container" class="my-6 p-4 bg-white rounded-xl shadow-sm border flex flex-wrap items-center gap-4">
+    </div>
+
+<div class="bg-white rounded-xl shadow-sm border">
+    <div class="p-4 flex flex-wrap justify-between items-center gap-4 border-b">
+        <div>
+            <h3 class="font-semibold text-slate-800">Hasil Laporan</h3>
+            <p id="laporan-summary" class="text-xs text-slate-500">Silakan pilih filter untuk menghasilkan laporan.</p>
+        </div>
+        <div id="laporan-actions" class="flex items-center gap-2 hidden">
+            <button id="export-pdf-btn" class="inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium border bg-white text-slate-800 hover:bg-slate-50 px-3 py-2">
+                <i data-lucide="file-text" class="w-4 h-4 text-red-600"></i> PDF
+            </button>
+            <button id="export-excel-btn" class="inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium border bg-white text-slate-800 hover:bg-slate-50 px-3 py-2">
+                <i data-lucide="file-spreadsheet" class="w-4 h-4 text-green-600"></i> Excel
+            </button>
+            <button id="export-csv-btn" class="inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium border bg-white text-slate-800 hover:bg-slate-50 px-3 py-2">
+                <i data-lucide="file-digit" class="w-4 h-4 text-blue-600"></i> CSV
+            </button>
+        </div>
+    </div>
+    <div id="laporan-preview-container" class="overflow-x-auto">
+        <p class="p-8 text-center text-slate-400">Pratinjau laporan akan ditampilkan di sini.</p>
+    </div>
+</div>

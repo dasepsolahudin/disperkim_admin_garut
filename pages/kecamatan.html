@@ -1,0 +1,44 @@
+<div class="flex flex-wrap justify-between items-center gap-4 mb-6">
+    <div>
+        <h2 class="text-3xl font-bold text-slate-800">Data Kecamatan</h2>
+        <p class="text-sm text-slate-500 mt-1">Kelola data perumahan dan demografis setiap kecamatan di Kabupaten Garut.</p>
+    </div>
+    <div class="flex items-center gap-2">
+        <div class="relative inline-block text-left">
+            <div>
+                <button type="button" id="export-menu-btn" class="inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium border bg-white text-slate-800 hover:bg-slate-50 px-4 py-2">
+                    <i data-lucide="download" class="w-4 h-4"></i>
+                    Export Data
+                    <i data-lucide="chevron-down" class="w-4 h-4 -mr-1"></i>
+                </button>
+            </div>
+            <div id="export-menu-dropdown" class="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none hidden z-10">
+                <div class="py-1">
+                    <a href="#" id="export-pdf-btn" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"><i data-lucide="file-text" class="w-4 h-4"></i> Unduh PDF</a>
+                    <a href="#" id="export-excel-btn" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"><i data-lucide="file-spreadsheet" class="w-4 h-4"></i> Unduh Excel</a>
+                    <a href="#" id="export-csv-btn" class="flex items-center gap-3 px-4 py-2 text-sm text-slate-700 hover:bg-slate-100"><i data-lucide="file-digit" class="w-4 h-4"></i> Unduh CSV</a>
+                </div>
+            </div>
+        </div>
+        <button id="update-kecamatan-btn" class="inline-flex items-center justify-center gap-2 rounded-lg text-sm font-medium bg-slate-900 text-white hover:bg-slate-800 px-4 py-2">
+            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            Update Data
+        </button>
+    </div>
+</div>
+
+<div id="kecamatan-kpi-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6"></div>
+
+<div class="flex justify-between items-center mb-4">
+    <div class="relative w-full max-w-sm">
+        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400"></i>
+        <input type="text" id="search-kecamatan-input" placeholder="Cari Kecamatan..." class="w-full bg-white border border-slate-200 rounded-lg pl-11 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition" />
+    </div>
+    <select id="sort-kecamatan-select" class="bg-white border border-slate-200 rounded-lg px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+        <option value="nama-az">Urutkan: Nama A-Z</option>
+        <option value="nama-za">Urutkan: Nama Z-A</option>
+        <option value="populasi-tertinggi">Populasi Tertinggi</option>
+    </select>
+</div>
+
+<div id="kecamatan-list-container" class="grid grid-cols-1 md:grid-cols-2 gap-6"></div>

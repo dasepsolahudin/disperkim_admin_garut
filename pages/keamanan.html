@@ -1,0 +1,26 @@
+<h3 class="text-xl font-bold text-slate-800">Keamanan Akun</h3>
+<p class="text-sm text-slate-500 mt-1">Ubah kata sandi Anda secara berkala untuk menjaga keamanan akun.</p>
+
+<form id="keamanan-form" class="mt-6 space-y-6">
+    <div class="flex flex-col md:flex-row items-center gap-6">
+        <label for="password-lama-input" class="w-full md:w-1/4 text-sm font-medium">Password Lama</label>
+        <div class="w-full md:w-3/4">
+            <input type="password" id="password-lama-input" name="password_lama" placeholder="Masukkan password lama" class="w-full p-2 border rounded-lg text-sm">
+        </div>
+    </div>
+    <div class="flex flex-col md:flex-row items-center gap-6">
+        <label for="password-baru-input" class="w-full md:w-1/4 text-sm font-medium">Password Baru</label>
+        <div class="w-full md:w-3/4">
+            <input type="password" id="password-baru-input" name="password_baru" placeholder="Masukkan password baru" class="w-full p-2 border rounded-lg text-sm">
+        </div>
+    </div>
+    <div class="flex flex-col md:flex-row items-center gap-6">
+        <label for="konfirmasi-password-input" class="w-full md:w-1/4 text-sm font-medium">Konfirmasi Password</label>
+        <div class="w-full md:w-3/4">
+            <input type="password" id="konfirmasi-password-input" name="konfirmasi_password" placeholder="Ketik ulang password baru" class="w-full p-2 border rounded-lg text-sm">
+        </div>
+    </div>
+    <div class="flex justify-end pt-4">
+        <button type="submit" class="bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 text-sm font-medium">Ubah Password</button>
+    </div>
+</form>

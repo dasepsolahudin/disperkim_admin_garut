@@ -1,0 +1,1 @@
+export const getStatusBadge = (status, colorMap) => `<span class="px-2 py-1 text-xs font-semibold rounded-full ${colorMap[status] || 'bg-slate-100 text-slate-800'}">${status}</span>`;

@@ -1,0 +1,31 @@
+<h3 class="text-xl font-bold text-slate-800">Profil Publik</h3>
+<p class="text-sm text-slate-500 mt-1">Informasi ini akan ditampilkan di profil Anda.</p>
+
+<form id="profil-form" class="mt-6 space-y-6">
+    <div class="flex flex-col md:flex-row items-start gap-6">
+        <label class="w-full md:w-1/4 text-sm font-medium pt-2">Foto Profil</label>
+        <div class="w-full md:w-3/4 flex items-center gap-4">
+            <img id="profile-avatar-preview" src="https://placehold.co/80x80/7e22ce/FFFFFF?text=A" alt="Avatar" class="w-20 h-20 rounded-full object-cover">
+            <div>
+                <input type="file" id="avatar-upload-input" class="hidden" accept="image/png, image/jpeg">
+                <button type="button" id="change-avatar-button" class="text-sm font-semibold text-blue-600 hover:underline">Ganti Foto</button>
+                <p class="text-xs text-slate-400 mt-1">PNG atau JPG, maks 2MB.</p>
+            </div>
+        </div>
+    </div>
+    <div class="flex flex-col md:flex-row items-center gap-6">
+        <label for="nama-lengkap-input" class="w-full md:w-1/4 text-sm font-medium">Nama Lengkap</label>
+        <div class="w-full md:w-3/4">
+            <input type="text" id="nama-lengkap-input" name="nama_lengkap" class="w-full p-2 border rounded-lg text-sm">
+        </div>
+    </div>
+    <div class="flex flex-col md:flex-row items-center gap-6">
+        <label class="w-full md:w-1/4 text-sm font-medium">Email</label>
+        <div class="w-full md:w-3/4">
+             <input type="email" id="email-input" name="email" class="w-full p-2 border rounded-lg text-sm bg-slate-100 cursor-not-allowed" readonly>
+        </div>
+    </div>
+    <div class="flex justify-end pt-4">
+        <button type="submit" class="bg-slate-900 text-white px-5 py-2.5 rounded-lg hover:bg-slate-800 text-sm font-medium">Simpan Perubahan Profil</button>
+    </div>
+</form>
