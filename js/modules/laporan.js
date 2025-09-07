@@ -4,11 +4,12 @@ import { showSuccessToast } from '../ui.js';
 let activeReport = 'pengaduan';
 let filteredData = [];
 
-// Konfigurasi untuk setiap jenis laporan
+// [DIPERBARUI] Menambahkan 'keys' untuk memetakan data saat ekspor
 const reportConfigs = {
     pengaduan: {
         dataSource: () => mockDatabase.complaints,
         columns: ['ID', 'Judul', 'Lokasi', 'Status', 'Tanggal', 'Prioritas'],
+        keys: ['id', 'title', 'location', 'status', 'date', 'prioritas'],
         renderRow: (item) => `
             <td>${item.id}</td>
             <td>${item.title}</td>
@@ -19,16 +20,16 @@ const reportConfigs = {
         `,
         filters: `
             <div class="flex-1 min-w-[200px]">
-                <label for="filter-tanggal-mulai" class="text-sm font-medium text-slate-600">Tanggal Mulai:</label>
-                <input type="date" id="filter-tanggal-mulai" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm">
+                <label for="filter-tanggal-mulai" class="text-sm font-medium text-slate-600 dark:text-slate-300">Tanggal Mulai:</label>
+                <input type="date" id="filter-tanggal-mulai" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm dark:bg-slate-700 dark:border-slate-600">
             </div>
             <div class="flex-1 min-w-[200px]">
-                <label for="filter-tanggal-akhir" class="text-sm font-medium text-slate-600">Tanggal Akhir:</label>
-                <input type="date" id="filter-tanggal-akhir" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm">
+                <label for="filter-tanggal-akhir" class="text-sm font-medium text-slate-600 dark:text-slate-300">Tanggal Akhir:</label>
+                <input type="date" id="filter-tanggal-akhir" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm dark:bg-slate-700 dark:border-slate-600">
             </div>
             <div class="flex-1 min-w-[150px]">
-                <label for="filter-status" class="text-sm font-medium text-slate-600">Status:</label>
-                <select id="filter-status" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm">
+                <label for="filter-status" class="text-sm font-medium text-slate-600 dark:text-slate-300">Status:</label>
+                <select id="filter-status" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm dark:bg-slate-700 dark:border-slate-600">
                     <option value="Semua">Semua</option>
                     <option value="Baru">Baru</option>
                     <option value="Pengerjaan">Pengerjaan</option>
@@ -39,7 +40,8 @@ const reportConfigs = {
     },
     infrastruktur: {
         dataSource: () => mockDatabase.infrastructures,
-        columns: ['ID', 'Jenis', 'Lokasi', 'Status', 'Tanggal'],
+        columns: ['ID', 'Jenis Infrastruktur', 'Lokasi', 'Status', 'Tanggal'],
+        keys: ['id', 'type', 'location', 'status', 'date'],
         renderRow: (item) => `
             <td>${item.id}</td>
             <td>${item.type}</td>
@@ -49,8 +51,8 @@ const reportConfigs = {
         `,
         filters: `
              <div class="flex-1 min-w-[150px]">
-                <label for="filter-status-infra" class="text-sm font-medium text-slate-600">Status:</label>
-                <select id="filter-status-infra" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm">
+                <label for="filter-status-infra" class="text-sm font-medium text-slate-600 dark:text-slate-300">Status:</label>
+                <select id="filter-status-infra" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm dark:bg-slate-700 dark:border-slate-600">
                     <option value="Semua">Semua</option>
                     <option value="Perencanaan">Perencanaan</option>
                     <option value="Pengerjaan">Pengerjaan</option>
@@ -61,7 +63,8 @@ const reportConfigs = {
     },
     perumahan: {
         dataSource: () => mockDatabase.housings,
-        columns: ['Nama', 'Lokasi', 'Tipe', 'Unit', 'Status'],
+        columns: ['Nama Perumahan', 'Lokasi', 'Tipe', 'Jumlah Unit', 'Status'],
+        keys: ['name', 'location', 'type', 'units', 'status'],
         renderRow: (item) => `
             <td>${item.name}</td>
             <td>${item.location}</td>
@@ -71,8 +74,8 @@ const reportConfigs = {
         `,
         filters: `
              <div class="flex-1 min-w-[150px]">
-                <label for="filter-status-perumahan" class="text-sm font-medium text-slate-600">Status:</label>
-                <select id="filter-status-perumahan" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm">
+                <label for="filter-status-perumahan" class="text-sm font-medium text-slate-600 dark:text-slate-300">Status:</label>
+                <select id="filter-status-perumahan" class="w-full mt-1 bg-slate-50 border border-slate-200 rounded-lg p-2 text-sm dark:bg-slate-700 dark:border-slate-600">
                     <option value="Semua">Semua</option>
                     <option value="Terverifikasi">Terverifikasi</option>
                     <option value="Baru">Baru</option>
@@ -134,8 +137,14 @@ function generateReport() {
         const endDate = document.getElementById('filter-tanggal-akhir').value;
         const status = document.getElementById('filter-status').value;
 
-        if (startDate) data = data.filter(item => new Date(item.date) >= new Date(startDate));
-        if (endDate) data = data.filter(item => new Date(item.date) <= new Date(endDate));
+        if (startDate) {
+            const start = new Date(startDate);
+            if (!isNaN(start)) data = data.filter(item => new Date(item.date) >= start);
+        }
+        if (endDate) {
+            const end = new Date(endDate);
+            if (!isNaN(end)) data = data.filter(item => new Date(item.date) <= end);
+        }
         if (status !== 'Semua') data = data.filter(item => item.status === status);
     } else if (activeReport === 'infrastruktur') {
         const status = document.getElementById('filter-status-infra').value;
@@ -155,7 +164,7 @@ function renderReportPreview() {
     const actionsEl = document.getElementById('laporan-actions');
 
     if (filteredData.length === 0) {
-        container.innerHTML = `<p class="p-8 text-center text-slate-400">Tidak ada data yang cocok dengan filter Anda.</p>`;
+        container.innerHTML = `<p class="p-8 text-center text-slate-400 dark:text-slate-500">Tidak ada data yang cocok dengan filter Anda.</p>`;
         summaryEl.textContent = 'Tidak ada hasil ditemukan.';
         actionsEl.classList.add('hidden');
         return;
@@ -163,11 +172,19 @@ function renderReportPreview() {
 
     const config = reportConfigs[activeReport];
     const headers = config.columns.map(col => `<th class="p-4 font-semibold">${col}</th>`).join('');
-    const rows = filteredData.map(item => `<tr class="border-b hover:bg-slate-50"><td class="p-4">${config.renderRow(item).substring(4)}</tr>`).join('');
+    // [PERBAIKAN] Memperbaiki cara baris tabel dibuat.
+    const rows = filteredData.map(item => {
+        const cells = config.renderRow(item).trim().split('</td>').filter(c => c.trim() !== '');
+        return `
+            <tr class="border-b dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700/50">
+                ${cells.map(cell => `<td class="p-4">${cell.replace(/<td>/g, '')}</td>`).join('')}
+            </tr>
+        `;
+    }).join('');
 
     container.innerHTML = `
         <table class="w-full text-sm text-left">
-            <thead class="bg-slate-50"><tr class="border-b">${headers}</tr></thead>
+            <thead class="bg-slate-50 dark:bg-slate-700"><tr class="border-b dark:border-slate-600">${headers}</tr></thead>
             <tbody>${rows}</tbody>
         </table>
     `;
@@ -177,69 +194,26 @@ function renderReportPreview() {
 }
 
 function clearReportPreview() {
-    document.getElementById('laporan-preview-container').innerHTML = `<p class="p-8 text-center text-slate-400">Pratinjau laporan akan ditampilkan di sini.</p>`;
+    document.getElementById('laporan-preview-container').innerHTML = `<p class="p-8 text-center text-slate-400 dark:text-slate-500">Pratinjau laporan akan ditampilkan di sini.</p>`;
     document.getElementById('laporan-summary').textContent = 'Silakan pilih filter untuk menghasilkan laporan.';
     document.getElementById('laporan-actions').classList.add('hidden');
     filteredData = [];
 }
 
 function setupActionButtons() {
-    document.getElementById('export-csv-btn')?.addEventListener('click', () => exportToCSV());
     document.getElementById('export-pdf-btn')?.addEventListener('click', () => exportToPDF());
     document.getElementById('export-excel-btn')?.addEventListener('click', () => exportToExcel());
+    document.getElementById('export-csv-btn')?.addEventListener('click', () => exportToCSV());
 }
 
 // --- FUNGSI-FUNGSI EKSPOR ---
+
 function getExportableData() {
     if (filteredData.length === 0) {
         alert("Tidak ada data untuk diekspor. Silakan buat laporan terlebih dahulu.");
         return null;
     }
-    // Membersihkan data untuk diekspor
-    return filteredData.map(item => {
-        const cleanItem = { ...item };
-        // Hapus properti yang tidak relevan jika ada (misal: deskripsi panjang)
-        delete cleanItem.description; 
-        delete cleanItem.userId;
-        return cleanItem;
-    });
-}
-
-function exportToCSV() {
-    const data = getExportableData();
-    if (!data) return;
-
-    const csv = Papa.unparse(data);
-    downloadFile(csv, 'text/csv;charset=utf-8;', 'laporan.csv');
-    showSuccessToast("Laporan CSV berhasil diekspor!");
-}
-
-function exportToPDF() {
-    const data = getExportableData();
-    if (!data) return;
-
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    
-    doc.text(`Laporan ${activeReport.charAt(0).toUpperCase() + activeReport.slice(1)}`, 14, 16);
-    doc.autoTable({
-        head: [Object.keys(data[0])],
-        body: data.map(Object.values),
-        startY: 20
-    });
-    doc.save(`laporan-${activeReport}.pdf`);
-    showSuccessToast("Laporan PDF berhasil diekspor!");
-}
-
-function exportToExcel() {
-    const data = getExportableData();
-    if (!data) return;
-
-    const worksheet = XLSX.utils.json_to_sheet(data);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, `Laporan ${activeReport}`);
-    XLSX.writeFile(workbook, `laporan-${activeReport}.xlsx`);
-    showSuccessToast("Laporan Excel berhasil diekspor!");
+    return filteredData;
 }
 
 function downloadFile(content, mimeType, fileName) {
@@ -252,4 +226,68 @@ function downloadFile(content, mimeType, fileName) {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+}
+
+// [PERBAIKAN] Logika ekspor CSV diperbarui
+function exportToCSV() {
+    const data = getExportableData();
+    if (!data) return;
+
+    const config = reportConfigs[activeReport];
+    const dataForExport = data.map(item => {
+        let row = {};
+        config.keys.forEach((key, index) => {
+            row[config.columns[index]] = item[key];
+        });
+        return row;
+    });
+    
+    const csv = Papa.unparse(dataForExport);
+    downloadFile(csv, 'text/csv;charset=utf-8;', `laporan-${activeReport}.csv`);
+    showSuccessToast("Laporan CSV berhasil diekspor!");
+}
+
+// [PERBAIKAN] Logika ekspor PDF diperbarui
+function exportToPDF() {
+    const data = getExportableData();
+    if (!data) return;
+
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+    const config = reportConfigs[activeReport];
+    
+    doc.text(`Laporan ${activeReport.charAt(0).toUpperCase() + activeReport.slice(1)}`, 14, 16);
+    
+    const head = [config.columns];
+    const body = data.map(item => config.keys.map(key => item[key] ?? '')); // Menggunakan nullish coalescing untuk nilai kosong
+
+    doc.autoTable({
+        head: head,
+        body: body,
+        startY: 20,
+        theme: 'grid'
+    });
+    doc.save(`laporan-${activeReport}.pdf`);
+    showSuccessToast("Laporan PDF berhasil diekspor!");
+}
+
+// [PERBAIKAN] Logika ekspor Excel diperbarui
+function exportToExcel() {
+    const data = getExportableData();
+    if (!data) return;
+
+    const config = reportConfigs[activeReport];
+    const dataForSheet = data.map(item => {
+        let row = {};
+        config.keys.forEach((key, index) => {
+            row[config.columns[index]] = item[key];
+        });
+        return row;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(dataForSheet);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, `Laporan`);
+    XLSX.writeFile(workbook, `laporan-${activeReport}.xlsx`);
+    showSuccessToast("Laporan Excel berhasil diekspor!");
 }

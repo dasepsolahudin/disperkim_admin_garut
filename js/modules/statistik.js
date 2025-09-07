@@ -1,5 +1,14 @@
 import { mockDatabase } from '../data.js';
 
+// [BARU] Menyimpan state filter yang sedang aktif
+let activeFilters = {
+    year: new Date().getFullYear().toString(), // Default ke tahun saat ini
+    kecamatan: 'Semua Kecamatan'
+};
+
+// [BARU] Objek untuk menyimpan instance chart agar bisa di-destroy
+const chartInstances = {};
+
 const subPageRenderers = {
     trend: renderTrendChart,
     kecamatan: renderKecamatanChart,
@@ -7,124 +16,164 @@ const subPageRenderers = {
     prioritas: renderPrioritasChart,
 };
 
-// Fungsi untuk mengupdate chart yang sedang aktif
+// [TETAP] Fungsi ini sekarang tidak digunakan secara langsung, digantikan applyFiltersAndRender
 export function updateStatistikCharts() {
-    const activeNav = document.querySelector('.statistik-nav-item.bg-slate-900');
-    if (activeNav) {
-        const activeSubPage = activeNav.dataset.subpage;
-        if (subPageRenderers[activeSubPage]) {
-            subPageRenderers[activeSubPage]();
-        }
-    }
+    applyFiltersAndRender();
 }
 
-// Fungsi utama yang dipanggil saat halaman Statistik dimuat
+// [DIPERBARUI] Fungsi utama yang dipanggil saat halaman Statistik dimuat
 export function initStatistik() {
-    const defaultSubPage = 'trend'; 
-    loadStatistikSubPage(defaultSubPage);
-    setActiveStatistikNavItem(defaultSubPage);
+    setupFilters();
+    const hash = window.location.hash.substring(1);
+    const subpage = hash.split('/')[1] || 'trend';
+    loadStatistikSubPage(subpage);
+    setActiveStatistikNavItem(subpage);
 }
 
-// Fungsi untuk memuat konten sub-halaman
+// [DIPERBARUI] Fungsi untuk memuat konten sub-halaman
 export async function loadStatistikSubPage(subPage) {
     const contentContainer = document.getElementById('statistik-content');
     if (!contentContainer) return;
-    contentContainer.innerHTML = '<p>Memuat...</p>';
+    contentContainer.innerHTML = '<p class="dark:text-white">Memuat...</p>';
     try {
         const response = await fetch(`pages/statistik/${subPage}.html`);
         if (!response.ok) throw new Error(`Sub-halaman "${subPage}.html" tidak ditemukan.`);
         contentContainer.innerHTML = await response.text();
         
-        if (subPageRenderers[subPage]) {
-            subPageRenderers[subPage]();
+        const renderer = subPageRenderers[subPage];
+        if (renderer) {
+            // Render chart dengan data yang sudah difilter
+            renderer(getFilteredData());
         }
     } catch (error) {
         contentContainer.innerHTML = `<p class="text-red-500">${error.message}</p>`;
     }
 }
 
-// Fungsi untuk menyorot menu navigasi yang aktif
+// [DIPERBARUI] Fungsi untuk menyorot menu navigasi yang aktif
 export function setActiveStatistikNavItem(subPage) {
     document.querySelectorAll('.statistik-nav-item').forEach(item => {
-        item.classList.toggle('bg-slate-900', item.dataset.subpage === subPage);
-        item.classList.toggle('text-white', item.dataset.subpage === subPage);
-        item.classList.toggle('bg-white', item.dataset.subpage !== subPage);
+        const isActive = item.dataset.subpage === subPage;
+        item.classList.toggle('bg-slate-900', isActive && document.documentElement.classList.contains('dark'));
+        item.classList.toggle('text-white', isActive);
+        item.classList.toggle('bg-blue-500', isActive && !document.documentElement.classList.contains('dark'));
+        item.classList.toggle('bg-white', !isActive);
+        item.classList.toggle('dark:bg-slate-700', !isActive);
     });
 }
 
-// --- FUNGSI-FUNGSI UNTUK MERENDER GRAFIK ---
+// --- [BARU] FUNGSI-FUNGSI BARU UNTUK FILTER ---
 
-// [DIPERBARUI] Fungsi ini sekarang menampilkan 12 bulan & membaca tanggal real-time
-function renderTrendChart() {
+// Fungsi untuk mengisi dan mengelola event listener pada filter
+function setupFilters() {
+    const yearSelect = document.getElementById('statistik-filter-tahun');
+    const kecamatanSelect = document.getElementById('statistik-filter-kecamatan');
+    const resetButton = document.getElementById('reset-statistik-filter-btn');
+
+    if (!yearSelect || !kecamatanSelect) return;
+
+    const years = [...new Set(mockDatabase.complaints.map(c => new Date(c.date).getFullYear()))];
+    yearSelect.innerHTML = '<option value="Semua Tahun">Semua Tahun</option>' + years.sort((a, b) => b - a).map(y => `<option value="${y}">${y}</option>`).join('');
+    
+    kecamatanSelect.innerHTML = '<option value="Semua Kecamatan">Semua Kecamatan</option>' + mockDatabase.kecamatanData.map(k => `<option value="${k.nama}">${k.nama}</option>`).join('');
+    
+    yearSelect.value = activeFilters.year;
+    kecamatanSelect.value = activeFilters.kecamatan;
+
+    yearSelect.addEventListener('change', () => {
+        activeFilters.year = yearSelect.value;
+        applyFiltersAndRender();
+    });
+
+    kecamatanSelect.addEventListener('change', () => {
+        activeFilters.kecamatan = kecamatanSelect.value;
+        applyFiltersAndRender();
+    });
+
+    resetButton.addEventListener('click', () => {
+        activeFilters.year = new Date().getFullYear().toString();
+        activeFilters.kecamatan = 'Semua Kecamatan';
+        yearSelect.value = activeFilters.year;
+        kecamatanSelect.value = activeFilters.kecamatan;
+        applyFiltersAndRender();
+    });
+}
+
+// Fungsi untuk mendapatkan data berdasarkan filter yang aktif
+function getFilteredData() {
+    let filtered = mockDatabase.complaints;
+
+    if (activeFilters.year !== 'Semua Tahun') {
+        filtered = filtered.filter(c => new Date(c.date).getFullYear().toString() === activeFilters.year);
+    }
+    if (activeFilters.kecamatan !== 'Semua Kecamatan') {
+        filtered = filtered.filter(c => c.kecamatan === activeFilters.kecamatan);
+    }
+    
+    return filtered;
+}
+
+// Fungsi untuk menerapkan filter dan me-render ulang chart
+function applyFiltersAndRender() {
+    const activeNav = document.querySelector('.statistik-nav-item.bg-blue-500, .statistik-nav-item.bg-slate-900');
+    if (activeNav) {
+        const activeSubPage = activeNav.dataset.subpage;
+        const renderer = subPageRenderers[activeSubPage];
+        if (renderer) {
+            renderer(getFilteredData());
+        }
+    }
+}
+
+// Fungsi helper untuk menghancurkan chart sebelum membuat yang baru
+function destroyChart(chartId) {
+    if (chartInstances[chartId]) {
+        chartInstances[chartId].destroy();
+    }
+}
+
+// --- [DIPERBARUI] FUNGSI-FUNGSI UNTUK MERENDER GRAFIK ---
+
+function renderTrendChart(data) {
     const ctx = document.getElementById('trendChart')?.getContext('2d');
     if (!ctx) return;
 
-    // Inisialisasi 12 bulan dengan data 0
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-    const monthlyCounts = {};
-    months.forEach(month => {
-        monthlyCounts[month] = 0;
+    const monthlyCounts = Array(12).fill(0);
+
+    data.forEach(c => {
+        const monthIndex = new Date(c.date).getMonth();
+        monthlyCounts[monthIndex]++;
     });
 
-    // Proses data pengaduan yang ada secara dinamis
-    const monthMap = { 0: 'Jan', 1: 'Feb', 2: 'Mar', 3: 'Apr', 4: 'Mei', 5: 'Jun', 6: 'Jul', 7: 'Agu', 8: 'Sep', 9: 'Okt', 10: 'Nov', 11: 'Des' };
-    mockDatabase.complaints.forEach(c => {
-        // Hanya proses pengaduan dari tahun saat ini (disimulasikan sebagai 2025)
-        const complaintDate = new Date(c.date);
-        if (complaintDate.getFullYear() === 2025) {
-            const monthIndex = complaintDate.getMonth();
-            const monthName = monthMap[monthIndex];
-            if(monthlyCounts.hasOwnProperty(monthName)) {
-                monthlyCounts[monthName]++;
-            }
-        }
-    });
-
-    if (window.trendChartInstance) {
-        window.trendChartInstance.destroy();
-    }
-
-    window.trendChartInstance = new Chart(ctx, {
+    destroyChart('trendChart');
+    chartInstances['trendChart'] = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: Object.keys(monthlyCounts),
+            labels: months,
             datasets: [{
-                label: `Jumlah Pengaduan Tahun ${new Date().getFullYear()}`,
-                data: Object.values(monthlyCounts),
+                label: `Jumlah Pengaduan`,
+                data: monthlyCounts,
                 backgroundColor: 'rgba(59, 130, 246, 0.7)',
                 borderColor: 'rgba(59, 130, 246, 1)',
                 borderWidth: 1
             }]
         },
-        options: { 
-            responsive: true, 
-            maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: {
-                        stepSize: 1 // Pastikan skala Y adalah bilangan bulat
-                    }
-                }
-            }
-        }
+        options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } } }
     });
 }
 
-function renderKecamatanChart() {
+function renderKecamatanChart(data) {
     const ctx = document.getElementById('kecamatanChart')?.getContext('2d');
     if (!ctx) return;
     
     const kecamatanCounts = {};
-    mockDatabase.complaints.forEach(c => {
+    data.forEach(c => {
         kecamatanCounts[c.kecamatan] = (kecamatanCounts[c.kecamatan] || 0) + 1;
     });
 
-    if (window.kecamatanChartInstance) {
-        window.kecamatanChartInstance.destroy();
-    }
-
-    window.kecamatanChartInstance = new Chart(ctx, {
+    destroyChart('kecamatanChart');
+    chartInstances['kecamatanChart'] = new Chart(ctx, {
         type: 'bar',
         data: {
             labels: Object.keys(kecamatanCounts),
@@ -138,20 +187,17 @@ function renderKecamatanChart() {
     });
 }
 
-function renderStatusChart() {
+function renderStatusChart(data) {
     const ctx = document.getElementById('statusChart')?.getContext('2d');
     if (!ctx) return;
     
     const statusCounts = {};
-    mockDatabase.complaints.forEach(c => {
+    data.forEach(c => {
         statusCounts[c.status] = (statusCounts[c.status] || 0) + 1;
     });
 
-    if (window.statusChartInstance) {
-        window.statusChartInstance.destroy();
-    }
-
-    window.statusChartInstance = new Chart(ctx, {
+    destroyChart('statusChart');
+    chartInstances['statusChart'] = new Chart(ctx, {
         type: 'doughnut',
         data: {
             labels: Object.keys(statusCounts),
@@ -164,20 +210,17 @@ function renderStatusChart() {
     });
 }
 
-function renderPrioritasChart() {
+function renderPrioritasChart(data) {
     const ctx = document.getElementById('prioritasChart')?.getContext('2d');
     if (!ctx) return;
 
     const prioritasCounts = {};
-    mockDatabase.complaints.forEach(c => {
+    data.forEach(c => {
         prioritasCounts[c.prioritas] = (prioritasCounts[c.prioritas] || 0) + 1;
     });
 
-    if (window.prioritasChartInstance) {
-        window.prioritasChartInstance.destroy();
-    }
-
-    window.prioritasChartInstance = new Chart(ctx, {
+    destroyChart('prioritasChart');
+    chartInstances['prioritasChart'] = new Chart(ctx, {
         type: 'pie',
         data: {
             labels: Object.keys(prioritasCounts),

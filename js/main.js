@@ -12,6 +12,7 @@ import * as Kecamatan from './modules/kecamatan.js';
 import * as Statistik from './modules/statistik.js';
 import * as Pengaturan from './modules/pengaturan.js';
 import * as Dashboard from './modules/dashboard.js';
+import * as Search from './modules/search.js';
 
 document.addEventListener('DOMContentLoaded', () => {
     // === ELEMEN DOM UTAMA ===
@@ -20,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const headerActions = document.getElementById('header-actions');
     const sidebar = document.getElementById('sidebar');
     const sidebarToggleBtn = document.getElementById('sidebar-toggle-btn');
+    const sidebarOverlay = document.getElementById('sidebar-overlay');
 
     // === KONFIGURASI MENU ===
     const menuItems = [
@@ -76,24 +78,22 @@ document.addEventListener('DOMContentLoaded', () => {
         `).join('');
     }
 
+    // [DIPERBARUI] Logika toggle sidebar sekarang menangani tampilan mobile dan desktop
     function setupSidebarToggle() {
         sidebarToggleBtn.addEventListener('click', () => {
-            sidebar.classList.toggle('w-64');
-            sidebar.classList.toggle('w-20');
-
-            document.querySelectorAll('.sidebar-text').forEach(text => {
-                text.classList.toggle('hidden');
-            });
-
-            document.getElementById('sidebar-logo-text').classList.toggle('hidden');
-
-            const icon = sidebarToggleBtn.querySelector('i');
-            if (sidebar.classList.contains('w-20')) {
-                icon.setAttribute('data-lucide', 'menu');
-            } else {
-                icon.setAttribute('data-lucide', 'panel-left-close');
+            if (window.innerWidth < 1024) { // Tampilan Mobile
+                sidebar.classList.remove('-translate-x-full');
+                sidebarOverlay.classList.remove('hidden');
+            } else { // Tampilan Desktop
+                sidebar.classList.toggle('w-64');
+                sidebar.classList.toggle('w-20');
+                document.querySelectorAll('.sidebar-text, #sidebar-logo-text').forEach(el => el.classList.toggle('hidden'));
             }
-            lucide.createIcons();
+        });
+
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
         });
     }
     
@@ -107,7 +107,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const loggedInUser = mockDatabase.users[0];
         const userInitial = loggedInUser.name.charAt(0).toUpperCase();
 
-        // Logika untuk menentukan sumber gambar avatar
         const avatarSrc = loggedInUser.avatar 
             ? loggedInUser.avatar 
             : `https://placehold.co/40x40/7e22ce/FFFFFF?text=${userInitial}`;
@@ -201,6 +200,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleRouting() {
+        // Menutup sidebar mobile setiap kali pindah halaman
+        if (window.innerWidth < 1024) {
+            sidebar.classList.add('-translate-x-full');
+            sidebarOverlay.classList.add('hidden');
+        }
+        
         const hash = window.location.hash.substring(1);
         const [page, subpage] = hash.split('/');
         const pageToLoad = page || 'dashboard';
@@ -231,6 +236,7 @@ document.addEventListener('DOMContentLoaded', () => {
             if (page.includes('perumahan')) Perumahan.showHousingForm(parseInt(id));
             if (page.includes('berita')) Berita.showBeritaForm(parseInt(id));
             if (page.includes('infrastruktur')) Infrastruktur.showInfrastrukturForm(id);
+            if (page.includes('pengaduan')) Pengaduan.showComplaintForm(id);
         }
 
         const deleteBtn = target.closest('.delete-btn');
@@ -252,7 +258,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (navItem) {
             e.preventDefault();
             const subPage = navItem.dataset.subpage;
-            // [DIPERBARUI] Menggunakan hash untuk navigasi sub-menu
             window.location.hash = `pengaturan/${subPage}`;
         }
 
@@ -260,7 +265,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if (statNavItem) {
             e.preventDefault();
             const subPage = statNavItem.dataset.subpage;
-            // [DIPERBARUI] Menggunakan hash untuk navigasi sub-menu
             window.location.hash = `statistik/${subPage}`;
         }
     });
@@ -268,20 +272,19 @@ document.addEventListener('DOMContentLoaded', () => {
     mainContent.addEventListener('submit', (e) => {
         e.preventDefault();
         const form = e.target;
-        // Hanya form profil dan keamanan yang butuh submit manual
         if (form.id === 'profil-form') Pengaturan.handleProfilFormSubmit(form);
         if (form.id === 'keamanan-form') Pengaturan.handleKeamananFormSubmit(form);
     });
 
     // === INISIALISASI APLIKASI ===
     function initApp() {
-        // [BARU] Menerapkan tema saat aplikasi dimuat pertama kali
         if (Pengaturan.applyTheme && mockDatabase.settings.tampilan) {
             Pengaturan.applyTheme(mockDatabase.settings.tampilan.dark_mode);
         }
-
+        
         renderSidebar();
         renderHeader();
+        Search.initGlobalSearch();
         setupSidebarToggle();
         window.addEventListener('hashchange', handleRouting);
         handleRouting();
@@ -300,3 +303,4 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initApp();
 });
+

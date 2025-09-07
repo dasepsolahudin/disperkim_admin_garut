@@ -1,17 +1,18 @@
-<h2 class="text-3xl font-bold text-slate-800 mb-6">Dashboard</h2>
+<h2 class="text-3xl font-bold text-slate-800 dark:text-white">Dashboard Sistem Informasi Perumahan</h2>
+<p class="text-sm text-slate-500 mt-1 mb-6 dark:text-slate-400">Pantau data perumahan dan kelola pengaduan rutilahu di seluruh kecamatan Kabupaten Garut.</p>
+
+<div id="navigation-cards-container" class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    </div>
 
 <div id="kpi-cards-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
     </div>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div class="bg-white rounded-xl shadow-sm border p-6 col-span-1 lg:col-span-2">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Tren Pengaduan</h3>
-        <div class="h-72">
-            <canvas id="trendChart"></canvas>
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-6">
+    <div id="pengaduan-terbaru-container" class="lg:col-span-1 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700 p-6">
         </div>
-    </div>
-    
-    <div id="recent-activities-container" class="bg-white rounded-xl shadow-sm border p-6">
-        <h3 class="text-lg font-semibold text-slate-800 mb-4">Aktivitas Terbaru</h3>
+    <div id="peta-sebaran-container" class="lg:col-span-2 bg-white dark:bg-slate-800 rounded-xl shadow-sm border dark:border-slate-700 p-6">
         </div>
 </div>
+
+<div id="alert-container">
+    </div>

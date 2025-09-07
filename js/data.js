@@ -12,13 +12,14 @@ export let mockDatabase = {
         { id: 3, name: "Budi Santoso", email: "budi.santoso@garutkab.go.id", role: "Staff", status: "Tidak Aktif", password: "analis456", lastLogin: "1 minggu lalu", avatar: null },
         { id: 4, name: "Rina Marlina", email: "rina.marlina@garutkab.go.id", role: "Operator", status: "Aktif", password: "operator456", lastLogin: "5 jam lalu", avatar: null },
     ],
+    // [DIPERBARUI] Menambahkan array 'history' pada setiap pengaduan
     complaints: [
-        { id: "PNG-0821", title: "Jalan berlubang di Jl. Merdeka", description: "Terdapat lubang besar yang membahayakan pengendara...", location: "Jl. Merdeka No. 12", status: "Baru", date: "2025-08-31", userId: 2, kecamatan: "Garut Kota", prioritas: "Tinggi" },
-        { id: "PNG-0820", title: "Saluran air tersumbat", description: "Saluran air di depan ruko macet total...", location: "Jl. Ahmad Yani Blok C", status: "Pengerjaan", date: "2025-08-29", userId: 2, kecamatan: "Tarogong Kidul", prioritas: "Tinggi" },
-        { id: "PNG-0819", title: "Penerangan jalan umum mati", description: "Lampu jalan mati di sepanjang gang...", location: "Gang Mawar III", status: "Selesai", date: "2025-08-28", userId: 3, kecamatan: "Garut Kota", prioritas: "Sedang" },
-        { id: "PNG-0818", title: "Tumpukan sampah liar", description: "Sampah menumpuk di pinggir jalan...", location: "Jl. Cimanuk", status: "Baru", date: "2025-07-15", userId: 4, kecamatan: "Tarogong Kaler", prioritas: "Rendah" },
-        { id: "PNG-0817", title: "Kerusakan trotoar", description: "Trotoar rusak dan membahayakan pejalan kaki.", location: "Depan Alun-Alun", status: "Selesai", date: "2025-07-10", userId: 2, kecamatan: "Garut Kota", prioritas: "Sedang" },
-        { id: "PNG-0816", title: "Drainase buruk", description: "Area sering banjir karena drainase yang buruk.", location: "Perumahan Bumi Cempaka", status: "Pengerjaan", date: "2025-06-20", userId: 3, kecamatan: "Cibatu", prioritas: "Tinggi" }
+        { id: "PNG-0821", title: "Jalan berlubang di Jl. Merdeka", description: "Terdapat lubang besar yang membahayakan pengendara...", location: "Jl. Merdeka No. 12", status: "Baru", date: "2025-08-31", userId: 2, kecamatan: "Garut Kota", prioritas: "Tinggi", history: [{ timestamp: "2025-08-31T09:00:00Z", user: "Siti Nurhaliza", action: "Pengaduan dibuat." }] },
+        { id: "PNG-0820", title: "Saluran air tersumbat", description: "Saluran air di depan ruko macet total...", location: "Jl. Ahmad Yani Blok C", status: "Pengerjaan", date: "2025-08-29", userId: 2, kecamatan: "Tarogong Kidul", prioritas: "Tinggi", history: [{ timestamp: "2025-08-29T11:00:00Z", user: "Siti Nurhaliza", action: "Pengaduan dibuat." }, { timestamp: "2025-08-30T14:00:00Z", user: "Ahmad Sudrajat", action: "Status diubah menjadi 'Pengerjaan'." }] },
+        { id: "PNG-0819", title: "Penerangan jalan umum mati", description: "Lampu jalan mati di sepanjang gang...", location: "Gang Mawar III", status: "Selesai", date: "2025-08-28", userId: 3, kecamatan: "Garut Kota", prioritas: "Sedang", history: [{ timestamp: "2025-08-28T10:00:00Z", user: "Budi Santoso", action: "Pengaduan dibuat." }, { timestamp: "2025-08-29T16:00:00Z", user: "Ahmad Sudrajat", action: "Status diubah menjadi 'Pengerjaan'." }, { timestamp: "2025-08-31T12:00:00Z", user: "Ahmad Sudrajat", action: "Status diubah menjadi 'Selesai'." }] },
+        { id: "PNG-0818", title: "Tumpukan sampah liar", description: "Sampah menumpuk di pinggir jalan...", location: "Jl. Cimanuk", status: "Baru", date: "2025-07-15", userId: 4, kecamatan: "Tarogong Kaler", prioritas: "Rendah", history: [{ timestamp: "2025-07-15T08:30:00Z", user: "Rina Marlina", action: "Pengaduan dibuat." }] },
+        { id: "PNG-0817", title: "Kerusakan trotoar", description: "Trotoar rusak dan membahayakan pejalan kaki.", location: "Depan Alun-Alun", status: "Selesai", date: "2025-07-10", userId: 2, kecamatan: "Garut Kota", prioritas: "Sedang", history: [{ timestamp: "2025-07-10T13:00:00Z", user: "Siti Nurhaliza", action: "Pengaduan dibuat." }, { timestamp: "2025-07-11T10:00:00Z", user: "Ahmad Sudrajat", action: "Status diubah menjadi 'Selesai'." }] },
+        { id: "PNG-0816", title: "Drainase buruk", description: "Area sering banjir karena drainase yang buruk.", location: "Perumahan Bumi Cempaka", status: "Pengerjaan", date: "2025-06-20", userId: 3, kecamatan: "Cibatu", prioritas: "Tinggi", history: [{ timestamp: "2025-06-20T15:00:00Z", user: "Budi Santoso", action: "Pengaduan dibuat." }, { timestamp: "2025-06-22T09:00:00Z", user: "Ahmad Sudrajat", action: "Status diubah menjadi 'Pengerjaan'." }] }
     ],
     infrastructures: [
         { id: "INF-012", type: "Jalan & Jembatan", location: "Kec. Garut Kota", status: "Perencanaan", date: "2025-08-25" },
@@ -29,8 +30,8 @@ export let mockDatabase = {
         { id: 2, name: "Bukit Cempaka Indah", location: "Garut Kota", type: "Komersil", units: 80, status: "Baru" }
     ],
     news: [
-        { id: 1, title: "Peresmian Taman Kota Garut", category: "Pembangunan", status: "Published", publishDate: "2025-08-20" },
-        { id: 2, title: "Program Rumah Subsidi 2025", category: "Perumahan", status: "Draft", publishDate: "2025-09-01" }
+        { id: 1, title: "Peresmian Taman Kota Garut", category: "Pembangunan", status: "Published", publishDate: "2025-08-20", coverImage: "https://placehold.co/600x400/003366/FFFFFF?text=Taman+Kota", content: "<p>Pemerintah Kabupaten Garut secara resmi membuka Taman Kota baru yang berlokasi di pusat kota. Pembangunan ini diharapkan dapat menjadi oase baru bagi masyarakat perkotaan.</p>" },
+        { id: 2, title: "Program Rumah Subsidi 2025", category: "Perumahan", status: "Draft", publishDate: "2025-09-01", coverImage: null, content: "<p>Disperkim Garut akan segera meluncurkan program rumah subsidi untuk tahun 2025. Program ini ditujukan untuk membantu masyarakat berpenghasilan rendah memiliki hunian yang layak.</p>" }
     ],
     notifications: [
         { id: 1, text: "Pengaduan baru #PNG-0821 telah masuk.", time: "15 menit lalu", read: false, itemType: "pengaduan", itemId: "PNG-0821" },
@@ -83,8 +84,6 @@ export let mockDatabase = {
     ]
 };
 
-// --- [DIPERBARUI] Logika untuk memuat dan menyimpan ke LocalStorage ---
-
 function saveDatabase() {
     try {
         localStorage.setItem('disperkim_database', JSON.stringify(mockDatabase));
@@ -93,26 +92,19 @@ function saveDatabase() {
     }
 }
 
-// Fungsi ini menggabungkan data dari localStorage dengan data default
-// untuk memastikan semua properti baru (seperti 'tampilan') tersedia.
 function loadDatabase() {
     const storedDB = localStorage.getItem('disperkim_database');
     if (storedDB) {
         try {
             const savedDB = JSON.parse(storedDB);
             
-            // Menggabungkan data tersimpan ke dalam struktur default
-            // Ini akan menambahkan kunci yang hilang seperti 'tampilan' jika tidak ada
             Object.assign(mockDatabase.settings, savedDB.settings);
             Object.assign(mockDatabase.users, savedDB.users);
-            // ... dan seterusnya untuk data lain jika diperlukan
             
         } catch (e) {
             console.error("Gagal memuat dari localStorage, menggunakan data default.", e);
         }
     }
-    // Selalu simpan kembali setelah memuat untuk memastikan struktur data 
-    // di localStorage selalu yang terbaru.
     saveDatabase();
 }
 
